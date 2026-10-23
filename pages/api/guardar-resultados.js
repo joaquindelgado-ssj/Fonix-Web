@@ -1,4 +1,4 @@
-import { neon } from 'https://ep-solitary-pine-b62an00s.apirest.c-2.sa-east-1.aws.neon.tech/neondb/rest/v1';
+import { neon } from '@neondatabase/serverless';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const { nombre, edad, provincia, colegio, numero_prueba, datos_crudos } = req.body;
 
   try {
-    // Inicializamos el cliente serverless de Neon usando la variable de entorno de Vercel
+    // Se conecta usando la variable de entorno configurada en Vercel
     const sql = neon(process.env.DATABASE_URL);
 
     // --- CÁLCULOS Y FÓRMULAS MATEMÁTICAS ---
