@@ -1,4 +1,4 @@
-import { neon } from '@neondatabase/serverless';
+import { neon } from 'https://ep-solitary-pine-b62an00s.apirest.c-2.sa-east-1.aws.neon.tech/neondb/rest/v1';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
