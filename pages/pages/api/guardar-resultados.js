@@ -1,4 +1,11 @@
-import { sql } from '@vercel/postgres';
+import { Pool } from 'pg';
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,7 +15,6 @@ export default async function handler(req, res) {
   const { nombre, edad, provincia, colegio, numero_prueba, datos_crudos } = req.body;
 
   try {
-    // --- FÓRMULAS MATEMÁTICAS Y CÁLCULO DE KPIS (OCULTO EN EL SERVIDOR) ---
     const totM1 = (datos_crudos.m1_aciertos || 0) + (datos_crudos.m1_fallos || 0);
     const kpi_m1_precision = totM1 > 0 ? parseFloat(((datos_crudos.m1_aciertos / totM1) * 100).toFixed(2)) : 0;
 
@@ -45,18 +51,21 @@ export default async function handler(req, res) {
 
     const fecha_hora = new Date().toISOString();
 
-    // --- INSERCIÓN EN NEON (POSTGRESQL) ---
-    await sql`
+    const query = `
       INSERT INTO resultados_feria (
         numero_prueba, nombre, edad, provincia, colegio, fecha_hora, puntaje_global, fallos_totales,
         kpi_m1_precision, kpi_m2_vel_seg, kpi_m3_discrim, kpi_m4_reaccion,
         kpi_m5_precision, latencia_promedio
-      ) VALUES (
-        ${numero_prueba}, ${nombre}, ${edad}, ${provincia}, ${colegio}, ${fecha_hora}, ${puntaje_global}, ${fallos_totales},
-        ${kpi_m1_precision}, ${kpi_m2_vel_seg}, ${kpi_m3_discrim}, ${kpi_m4_reaccion},
-        ${kpi_m5_precision}, ${latencia_promedio}
-      )
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
     `;
+
+    const values = [
+      numero_prueba, nombre, edad, provincia, colegio, fecha_hora, puntaje_global, fallos_totales,
+      kpi_m1_precision, kpi_m2_vel_seg, kpi_m3_discrim, kpi_m4_reaccion,
+      kpi_m5_precision, latencia_promedio
+    ];
+
+    await pool.query(query, values);
 
     return res.status(200).json({ success: true, puntaje_global });
   } catch (error) {
