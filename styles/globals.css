@@ -375,3 +375,22 @@ input, select { user-select: text; -webkit-user-select: text; }
 .d6-b { display: flex; gap: 10px; }
 .d6-b i { width: 40px; height: 40px; border-radius: 10px; border: 3px solid var(--tiza); display: block; }
 .d6-b i.ok { animation: d3 2.4s infinite; }
+
+/* Buscador de escuelas */
+.esc-lista {
+  position: absolute; left: 0; right: 0; top: 100%; z-index: 30; margin-top: 4px;
+  background: #23493a; border: 2px solid var(--tiza-tenue); border-radius: 12px;
+  max-height: 290px; overflow-y: auto; box-shadow: 0 10px 24px rgba(0,0,0,.4);
+}
+.esc-op {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%;
+  padding: 9px 14px; background: transparent; border: 0; border-bottom: 1px dashed rgba(255,255,255,.12);
+  color: var(--tiza); font-family: var(--fuente-ui); text-align: left; cursor: pointer;
+}
+.esc-op b { font-size: 18px; font-weight: 400; }
+.esc-op small { font-size: 14px; color: var(--tiza-tenue); }
+.esc-op:hover { background: rgba(255,255,255,.08); }
+.esc-manual { color: var(--celeste); font-size: 16px; }
+.esc-elegida { display: flex; align-items: center; gap: 12px; font-size: clamp(18px, 2vw, 22px); color: var(--verde-tiza); border-bottom: 3px solid var(--verde-tiza); padding: 4px 4px 6px; }
+.esc-elegida span { flex: 1; }
+.esc-cambiar { background: transparent; border: 1px solid var(--tiza-tenue); color: var(--tiza-suave); border-radius: 8px; font-family: var(--fuente-ui); font-size: 15px; cursor: pointer; padding: 2px 10px; }
