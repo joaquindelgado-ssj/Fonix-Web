@@ -1,8 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import { RONDAS } from '../lib/datos';
 import { esperar, useTecla } from '../lib/util';
 
-const NOMBRES = ['Unir', 'Separar', 'Símbolos', 'Cambios', 'Números'];
+const NOMBRES = ['Unir', 'Separar', 'Símbolos', 'Cambios', 'Colores', 'Números'];
 
 export function Pizarron({ juegoActual = -1, onSalir, children }) {
   const pantallaCompleta = () => {
@@ -60,7 +59,7 @@ export function Exito() {
 
 // Controla las 4 rondas de un minijuego: guarda cada resultado, muestra el
 // tilde (si corresponde) y avanza. Al terminar llama a onFin(resultados).
-export function useRondas(onFin) {
+export function useRondas(onFin, total = 4) {
   const [ronda, setRonda] = useState(0);
   const [exito, setExito] = useState(false);
   const [pausa, setPausa] = useState(false);
@@ -73,14 +72,14 @@ export function useRondas(onFin) {
     resultados.current.push(res);
     setPausa(true);
     if (tilde) { setExito(true); await esperar(520); setExito(false); } else { await esperar(demora); }
-    if (resultados.current.length >= RONDAS) {
+    if (resultados.current.length >= total) {
       onFin(resultados.current);
     } else {
       setRonda((r) => r + 1);
       setPausa(false);
       cerrando.current = false;
     }
-  }, [onFin]);
+  }, [onFin, total]);
 
   return { ronda, exito, pausa, terminarRonda };
 }

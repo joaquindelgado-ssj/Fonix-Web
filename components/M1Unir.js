@@ -1,19 +1,21 @@
 // Minijuego 1: Unir columnas (jugar_m1_unir de FonixV1.5eco.py)
 import { useMemo, useRef, useState } from 'react';
-import { DATOS_M1, FUENTES_COMPLICADAS, FUENTE_AMIGABLE, RONDAS, mezclar, randInt } from '../lib/datos';
+import { ENSAYOS, FUENTES_COMPLICADAS, FUENTE_AMIGABLE, mezclar, planM1 } from '../lib/datos';
 import { ahora, r3 } from '../lib/util';
 import { Exito, useRondas } from './comun';
 
 export default function M1Unir({ onFin }) {
-  // Una ronda al azar usa la tipografía amigable; las otras 3, tipografías complicadas
-  const rondaAmigable = useMemo(() => randInt(0, RONDAS - 1), []);
-  const { ronda, exito, pausa, terminarRonda } = useRondas(onFin);
+  // 2 rondas con tipografía amigable y 2 con tipografías complicadas, en orden
+  // contrabalanceado ABBA / BAAB, con sets de palabras de igual dificultad.
+  const plan = useMemo(() => planM1(), []);
+  const { ronda, exito, pausa, terminarRonda } = useRondas(onFin, ENSAYOS.m1);
   return (
     <>
       <RondaM1
         key={ronda}
         ronda={ronda}
-        amigable={ronda === rondaAmigable}
+        palabras={plan[ronda].palabras}
+        amigable={plan[ronda].amigable}
         bloqueado={pausa}
         onTerminar={terminarRonda}
       />
@@ -22,8 +24,7 @@ export default function M1Unir({ onFin }) {
   );
 }
 
-function RondaM1({ ronda, amigable, bloqueado, onTerminar }) {
-  const palabras = DATOS_M1[ronda];
+function RondaM1({ ronda, palabras, amigable, bloqueado, onTerminar }) {
   const [izq] = useState(() => mezclar(palabras));
   const [der] = useState(() => mezclar(palabras));
   const [sel, setSel] = useState(null); // { lado: 'izq'|'der', i }
@@ -92,7 +93,7 @@ function RondaM1({ ronda, amigable, bloqueado, onTerminar }) {
 
   return (
     <div className="aparecer" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div className="ronda-label">Ronda {ronda + 1} de {RONDAS}</div>
+      <div className="ronda-label">Ronda {ronda + 1} de {ENSAYOS.m1}</div>
       <p className="consigna">Uní cada palabra con su pareja igual</p>
       <div className="m1">
         <div className="col">{izq.map((p, i) => caja('izq', p, i))}</div>

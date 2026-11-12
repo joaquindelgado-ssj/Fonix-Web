@@ -82,7 +82,7 @@ export function Final({ nombre, estado, onNueva }) {
       <div className="estrellas">★ ★ ★</div>
       <h1 className="titulo">¡Muchas gracias, {nombrePila}!</h1>
       <p className="sub">¡Lo hiciste genial!</p>
-      <p className="consigna" style={{ marginTop: 10 }}>Terminaste los 5 juegos de FONIX</p>
+      <p className="consigna" style={{ marginTop: 10 }}>Terminaste los 6 juegos de FONIX</p>
       <button className="btn grande" onClick={onNueva} style={{ marginTop: 16 }}>Nuevo jugador</button>
       <div className="estado-envio">
         {estado === 'enviando' && 'Guardando respuestas…'}
