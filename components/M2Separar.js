@@ -1,11 +1,11 @@
 // Minijuego 2: Separar palabras (jugar_m2_separar de FonixV1.5eco.py)
 import { useRef, useState } from 'react';
-import { DATOS_M2, RONDAS } from '../lib/datos';
+import { DATOS_M2, ENSAYOS } from '../lib/datos';
 import { ahora, r3 } from '../lib/util';
 import { Exito, useRondas } from './comun';
 
 export default function M2Separar({ onFin }) {
-  const { ronda, exito, pausa, terminarRonda } = useRondas(onFin);
+  const { ronda, exito, pausa, terminarRonda } = useRondas(onFin, ENSAYOS.m2);
   return (
     <>
       <RondaM2 key={ronda} ronda={ronda} bloqueado={pausa} onTerminar={terminarRonda} />
@@ -62,7 +62,7 @@ function RondaM2({ ronda, bloqueado, onTerminar }) {
 
   return (
     <div className="aparecer">
-      <div className="ronda-label">Ronda {ronda + 1} de {RONDAS}</div>
+      <div className="ronda-label">Ronda {ronda + 1} de {ENSAYOS.m2}</div>
       <p className="consigna">Tocá los espacios donde termina cada palabra</p>
       <div key={sac} className={`m2-frase tiza ${sac ? 'sacudir' : ''}`} style={{ '--cw': cw }}>
         {text.split('').map((letra, i) => (

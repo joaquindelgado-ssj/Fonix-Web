@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Instrucciones, Pizarron } from '../components/comun';
-import { DemoM1, DemoM2, DemoM3, DemoM4, DemoM5 } from '../components/demos';
+import { DemoM1, DemoM2, DemoM3, DemoM4, DemoM5, DemoM6 } from '../components/demos';
 import M1Unir from '../components/M1Unir';
 import M2Separar from '../components/M2Separar';
 import M3Simbolos from '../components/M3Simbolos';
 import M4Deteccion from '../components/M4Deteccion';
 import M5Discalculia from '../components/M5Discalculia';
+import M6Stroop from '../components/M6Stroop';
 import { Final, Registro } from '../components/Pantallas';
 import { enviarResultados, vaciarCola } from '../lib/envio';
 import { nuevoId } from '../lib/util';
+import { VERSION_PRUEBA } from '../lib/datos';
 
 const JUEGOS = [
   {
@@ -33,6 +35,7 @@ const JUEGOS = [
     lineas: [
       'Vas a ver una grilla de letras casi iguales.',
       'Una sola está espejada: es la intrusa.',
+      'A veces las letras van a estar muy juntas.',
       'Encontrala y tocala lo más rápido que puedas.',
     ],
   },
@@ -42,7 +45,17 @@ const JUEGOS = [
       'Una palabra aparece y se tapa con un cuadro negro.',
       'A veces, mientras está tapada, dos letras cambian de lugar.',
       'Cuando vuelva a aparecer cambiada, tocá “¡Cambió!”.',
-      '¡Ojo! Si avisás antes de que cambie, no vale.',
+      'En algunas rondas la palabra NO cambia: ahí no toques nada.',
+      'Son 6 rondas.',
+    ],
+  },
+  {
+    clave: 'm6', Comp: M6Stroop, demo: <DemoM6 />, titulo: 'Colores',
+    lineas: [
+      'Vas a ver palabras pintadas de un color.',
+      'Tocá el botón del COLOR DE LA TINTA, no lo que dice la palabra.',
+      'Si ves XXXX, también tocás su color.',
+      'Respondé rápido, pero tratando de no equivocarte.',
     ],
   },
   {
@@ -51,11 +64,13 @@ const JUEGOS = [
       'Vas a ver dos cuadros con números o puntitos.',
       'Tocá el cuadro que vale MÁS (no el que se ve más grande).',
       'Si valen lo mismo, tocá “Son iguales”.',
+      'Son 4 rondas de 5 cuadros cada una.',
     ],
   },
 ];
 
 const inicial = () => ({ fase: 'registro', juego: 0, paso: 'instr', participante: null, rondas: {}, id: null });
+// Orden: m1 m2 m3 m4 m6(Stroop) m5(Números): los juegos de lectura juntos y la discalculia al final.
 
 export default function Home() {
   const [e, setE] = useState(inicial);
@@ -84,7 +99,7 @@ export default function Home() {
   useEffect(() => {
     if (e.fase !== 'final') return;
     setEstadoEnvio('enviando');
-    enviarResultados({ id_sesion: e.id, participante: e.participante, rondas: e.rondas })
+    enviarResultados({ id_sesion: e.id, version: VERSION_PRUEBA, participante: e.participante, rondas: e.rondas })
       .then(setEstadoEnvio)
       .catch(() => setEstadoEnvio('pendiente'));
   }, [e.fase, e.id]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -66,3 +66,18 @@ export function DemoM5() {
     </div>
   );
 }
+
+export function DemoM6() {
+  return (
+    <div className="d6">
+      <div className="d6-t">ROJO</div>
+      <div className="d6-b">
+        <i style={{ background: '#d62828' }} />
+        <i className="ok" style={{ background: '#1d4ed8' }} />
+        <i style={{ background: '#111' }} />
+        <i style={{ background: '#d9a400' }} />
+      </div>
+      <div style={{ fontSize: 18, color: 'var(--celeste)' }}>Dice ROJO, pero está pintada de AZUL → tocás azul</div>
+    </div>
+  );
+}
