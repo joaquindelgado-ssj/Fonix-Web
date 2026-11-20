@@ -42,11 +42,11 @@ export function Pizarron({ juegoActual = -1, onSalir, burbuja = false, children 
         </header>
         <main className="escena">
           {/* .escena-int es el que scrollea si la pantalla es baja (celular horizontal, teclado abierto) */}
-          <div className={`escena-int ${burbuja ? 'con-burbuja' : ''}`}>
+          <div className="escena-int">
+            {burbuja && <SobreNosotros />}
             <div className="escena-centro">{children}</div>
           </div>
         </main>
-        {burbuja && <SobreNosotros />}
         <div className="repisa" aria-hidden="true">
           <div className="tizita" style={{ left: '14%', width: 46, background: '#f5f3ea' }} />
           <div className="tizita" style={{ left: '20%', width: 34, background: '#f7e27c' }} />
