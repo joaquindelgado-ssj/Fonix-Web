@@ -53,10 +53,14 @@ export default function SobreNosotros() {
 
             <div className="sn-equipo">
               {INTEGRANTES.map((p, i) => <Persona key={p.nombre} persona={p} indice={i} />)}
+              <div className="sn-profe">
+                <Persona persona={PROFESOR} indice={1} />
+              </div>
             </div>
 
-            <div className="sn-profe">
-              <Persona persona={PROFESOR} indice={1} />
+            <div className="sn-contacto">
+              <span className="sn-contacto-etq">Contactanos:</span>
+              <span className="sn-contacto-mail">{PROFESOR.correo}</span>
             </div>
           </div>
         </Modal>
@@ -69,10 +73,7 @@ function Persona({ persona, indice }) {
   return (
     <figure className={`sn-foto ${indice % 2 ? 'par' : ''}`}>
       <img src={persona.src} alt={persona.nombre} width="520" height="520" draggable="false" decoding="async" />
-      <figcaption>
-        {persona.nombre}
-        {persona.correo && <span className="sn-correo">{persona.correo}</span>}
-      </figcaption>
+      <figcaption>{persona.nombre}</figcaption>
     </figure>
   );
 }

@@ -541,8 +541,9 @@ input, select { user-select: text; -webkit-user-select: text; }
   font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(18px, 3.6vw, 42px); letter-spacing: .1em; line-height: 1;
   color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3);
 }
-.sn-equipo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 2vw, 22px); width: min(100%, 820px); }
-@media (min-width: 560px) { .sn-equipo { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+/* El profesor va dentro de la misma grilla: su foto mide el 85% del ancho de una columna (un poco más chica que las de los alumnos). */
+.sn-equipo { --cols: 2; --sep: clamp(12px, 2vw, 22px); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--sep); width: min(100%, 820px); }
+@media (min-width: 560px) { .sn-equipo { --cols: 4; } }
 .sn-foto {
   margin: 0; background: #fbfaf5; padding: 8px 8px 6px; border-radius: 4px;
   box-shadow: 3px 5px 0 rgba(0,0,0,.3); transform: rotate(-1.2deg);
@@ -550,10 +551,12 @@ input, select { user-select: text; -webkit-user-select: text; }
 .sn-foto.par { transform: rotate(1.4deg); }
 .sn-foto img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 2px; background: #ddd; }
 .sn-foto figcaption { padding: 7px 2px 2px; font-size: clamp(17px, 2vw, 21px); line-height: 1.1; color: #2b2d42; text-align: center; }
-.sn-profe { width: min(80%, 260px); }
+.sn-profe { grid-column: 1 / -1; justify-self: center; width: calc((100% - (var(--cols) - 1) * var(--sep)) / var(--cols) * .85); }
 .sn-profe .sn-foto { transform: rotate(.8deg); }
 .sn-profe .sn-foto figcaption { font-size: clamp(19px, 2.2vw, 23px); }
-.sn-correo { display: block; margin-top: 4px; font-size: clamp(12px, 3.3vw, 16px); white-space: nowrap; color: #4a4d63; user-select: text; -webkit-user-select: text; }
+.sn-contacto { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 100%; margin-top: clamp(6px, 1.5vw, 16px); }
+.sn-contacto-etq { font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(24px, 5vw, 44px); line-height: 1.1; color: var(--tiza); }
+.sn-contacto-mail { max-width: 100%; font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(16px, 5vw, 40px); line-height: 1.15; white-space: nowrap; color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3); user-select: text; -webkit-user-select: text; }
 
 /* confirmación de salir */
 .confirmar-panel { width: min(520px, 100%); }
