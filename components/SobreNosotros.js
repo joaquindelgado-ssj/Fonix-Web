@@ -69,7 +69,10 @@ function Persona({ persona, indice }) {
   return (
     <figure className={`sn-foto ${indice % 2 ? 'par' : ''}`}>
       <img src={persona.src} alt={persona.nombre} width="520" height="520" draggable="false" decoding="async" />
-      <figcaption>{persona.nombre}</figcaption>
+      <figcaption>
+        {persona.nombre}
+        {persona.correo && <span className="sn-correo">{persona.correo}</span>}
+      </figcaption>
     </figure>
   );
 }
