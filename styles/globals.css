@@ -17,6 +17,11 @@
   --fuente-estimulo: Arial, 'Arimo', sans-serif;
 }
 
+/* Alto "dinámico": en celulares 100vh incluye la barra del navegador y se pasa de lo visible.
+   --vh vale 1dvh donde el navegador lo soporta y 1vh donde no. */
+:root { --vh: 1vh; }
+@supports (height: 100dvh) { :root { --vh: 1dvh; } }
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -26,19 +31,30 @@ html, body {
   color: var(--tiza);
   font-family: var(--fuente-ui);
   -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   touch-action: manipulation;
   overscroll-behavior: none;
 }
 
-body { user-select: none; -webkit-user-select: none; }
+/* sin menú de copiar / lupa de selección al mantener apretado, sin arrastrar imágenes */
+body { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+img { -webkit-user-drag: none; }
 input, select { user-select: text; -webkit-user-select: text; }
 
 #__next { height: 100%; }
 
 /* ---------- marco de madera + pizarra ---------- */
 .marco {
-  min-height: 100%;
-  padding: clamp(8px, 1.6vw, 22px);
+  height: 100vh; /* respaldo */
+  height: 100dvh;
+  min-height: 0;
+  /* respeta el notch / barra de gestos en celulares */
+  padding:
+    max(clamp(8px, 1.6vw, 22px), env(safe-area-inset-top))
+    max(clamp(8px, 1.6vw, 22px), env(safe-area-inset-right))
+    max(clamp(8px, 1.6vw, 22px), env(safe-area-inset-bottom))
+    max(clamp(8px, 1.6vw, 22px), env(safe-area-inset-left));
   background:
     repeating-linear-gradient(92deg, rgba(0,0,0,.08) 0 3px, transparent 3px 11px),
     linear-gradient(180deg, var(--madera) 0%, var(--madera-osc) 100%);
@@ -48,6 +64,8 @@ input, select { user-select: text; -webkit-user-select: text; }
 .pizarra {
   position: relative;
   flex: 1;
+  min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   border-radius: 6px;
@@ -125,18 +143,36 @@ input, select { user-select: text; -webkit-user-select: text; }
 .acciones-top { display: flex; gap: 8px; }
 .btn-icono {
   background: transparent; border: 2px solid var(--tiza-tenue); color: var(--tiza-suave);
-  border-radius: 10px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; font-family: var(--fuente-ui);
+  border-radius: 10px; width: 44px; height: 44px; font-size: 20px; cursor: pointer; font-family: var(--fuente-ui);
+  display: grid; place-items: center; padding: 0;
 }
-.btn-icono:hover { border-color: var(--tiza); color: var(--tiza); }
+.btn-icono:active { border-color: var(--tiza); color: var(--tiza); background: rgba(255,255,255,.1); }
+@media (hover: hover) { .btn-icono:hover { border-color: var(--tiza); color: var(--tiza); } }
+@media (pointer: coarse) { .btn-icono { width: 48px; height: 48px; } }
 
 /* ---------- área principal ---------- */
 .escena {
   position: relative; z-index: 1;
   flex: 1;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: clamp(10px, 2vw, 28px);
+  min-height: 0;
+  display: flex; flex-direction: column;
   text-align: center;
 }
+/* Zona que scrollea cuando el contenido no entra (celular acostado, teclado abierto).
+   .escena-centro usa margin:auto para centrar SIN cortar la parte de arriba (justify-content:center
+   la hacía inalcanzable). No es position:relative a propósito: el tilde de acierto (.exito-capa)
+   se ancla a .escena y no se mueve con el scroll. */
+.escena-int {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: clamp(10px, 2vw, 28px);
+  overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.escena-centro { margin: auto; width: 100%; display: flex; flex-direction: column; align-items: center; }
+/* lugar para la burbuja "Sobre nosotros" (así el formulario puede scrollear por encima de ella) */
+@media (max-width: 760px) { .escena-int.con-burbuja { padding-bottom: calc(clamp(10px, 2vw, 28px) + 64px); } }
 .consigna { font-size: clamp(19px, 2.3vw, 27px); color: var(--tiza-suave); margin: 0 0 clamp(14px, 2.4vw, 30px); }
 .ronda-label { font-size: clamp(16px, 1.8vw, 21px); color: var(--amarillo); margin-bottom: 6px; letter-spacing: .04em; }
 
@@ -154,8 +190,8 @@ input, select { user-select: text; -webkit-user-select: text; }
   box-shadow: 0 0 0 1px rgba(255,255,255,.08), inset 0 0 12px rgba(255,255,255,.05);
   transition: transform .12s, background .15s, border-color .15s, color .15s;
 }
-.btn:hover { background: rgba(255,255,255,.1); transform: translateY(-1px) rotate(-.4deg); }
-.btn:active { transform: scale(.97); }
+@media (hover: hover) { .btn:hover { background: rgba(255,255,255,.1); transform: translateY(-1px) rotate(-.4deg); } }
+.btn:active { transform: scale(.97); background: rgba(255,255,255,.12); }
 .btn.primario { border-color: var(--amarillo); color: var(--amarillo); }
 .btn.grande { font-size: clamp(24px, 3vw, 34px); padding: .5em 1.8em; }
 .btn:disabled { opacity: .45; cursor: default; transform: none; }
@@ -174,6 +210,10 @@ input, select { user-select: text; -webkit-user-select: text; }
 .form select option { color: #222; }
 .form .fila { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; }
 .form .btn { align-self: center; margin-top: 10px; }
+/* campo con etiqueta + lista de resultados (escuela) */
+.campo { display: flex; flex-direction: column; gap: 4px; }
+.campo-etq { font-size: clamp(18px, 2vw, 22px); color: var(--tiza-suave); }
+.form input, .form select { min-height: 48px; } /* zona táctil cómoda */
 
 /* ---------- animaciones ---------- */
 @keyframes sacudir {
@@ -206,7 +246,12 @@ input, select { user-select: text; -webkit-user-select: text; }
   padding: 18px; position: relative;
 }
 .demo .etq { position: absolute; top: 8px; left: 14px; font-size: 16px; color: var(--celeste); }
-.instr-pie { grid-column: 1 / -1; text-align: center; margin-top: clamp(4px, 1.5vw, 16px); }
+.instr-pie {
+  grid-column: 1 / -1; text-align: center; margin-top: clamp(4px, 1.5vw, 16px);
+  /* en pantallas bajas el botón queda siempre a la vista, aunque haya que scrollear el texto */
+  position: sticky; bottom: -6px; z-index: 3; padding: 6px 0 4px;
+  background: linear-gradient(to top, rgba(34,68,52,.96) 65%, rgba(34,68,52,0));
+}
 @media (max-width: 760px) {
   .instr { grid-template-columns: 1fr; text-align: center; }
 }
@@ -224,7 +269,8 @@ input, select { user-select: text; -webkit-user-select: text; }
   color: var(--tiza); font-size: clamp(24px, 3vw, 34px);
   cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
 }
-.m1 .caja:hover { background: rgba(255,255,255,.08); }
+@media (hover: hover) { .m1 .caja:hover { background: rgba(255,255,255,.08); } }
+.m1 .caja:active { background: rgba(255,255,255,.12); }
 .m1 .caja.sel { border-color: var(--amarillo); color: var(--amarillo); box-shadow: 0 0 14px rgba(247,226,124,.35); }
 .m1 .caja.ok { border-color: var(--verde-tiza); color: var(--verde-tiza); background: rgba(185,242,161,.08); cursor: default; }
 .m1-medio { position: relative; }
@@ -245,10 +291,11 @@ input, select { user-select: text; -webkit-user-select: text; }
   position: absolute; top: 0; bottom: 0; right: calc(var(--cw) * -0.36); width: calc(var(--cw) * 0.72);
   z-index: 2; cursor: pointer; background: transparent; border: 0; padding: 0;
 }
-.m2-hueco:hover::after, .m2-hueco.marcado::after {
+.m2-hueco.marcado::after, .m2-hueco:focus-visible::after {
   content: ''; position: absolute; left: 50%; top: 4%; bottom: 4%; width: 4px; margin-left: -2px; border-radius: 3px;
   background: var(--tiza-tenue);
 }
+@media (hover: hover) { .m2-hueco:hover::after { content: ''; position: absolute; left: 50%; top: 4%; bottom: 4%; width: 4px; margin-left: -2px; border-radius: 3px; background: var(--tiza-tenue); } }
 .m2-hueco.marcado::after { background: var(--amarillo); box-shadow: 0 0 8px rgba(247,226,124,.6); }
 
 /* ---------- M3: símbolos ---------- */
@@ -261,7 +308,7 @@ input, select { user-select: text; -webkit-user-select: text; }
   border: 3px solid var(--tiza-tenue); border-radius: 12px;
   cursor: pointer; transition: border-color .12s, background .12s;
 }
-.m3-celda:hover { border-color: var(--celeste); background: rgba(159,216,242,.08); }
+@media (hover: hover) { .m3-celda:hover { border-color: var(--celeste); background: rgba(159,216,242,.08); } }
 
 /* ---------- M4: detección ---------- */
 .m4-papel {
@@ -290,7 +337,7 @@ input, select { user-select: text; -webkit-user-select: text; }
   color: var(--tiza); font-family: var(--fuente-estimulo); font-weight: 700; line-height: 1;
   transition: border-color .12s, background .12s;
 }
-.m5-caja:hover { border-color: var(--celeste); background: rgba(159,216,242,.06); }
+@media (hover: hover) { .m5-caja:hover { border-color: var(--celeste); background: rgba(159,216,242,.06); } }
 .m5-caja.grande { font-size: calc(var(--lado) * .55); }
 .m5-caja.pequeno { font-size: calc(var(--lado) * .16); }
 .m5-caja.neutral { font-size: calc(var(--lado) * .36); }
@@ -352,7 +399,7 @@ input, select { user-select: text; -webkit-user-select: text; }
   font-size: calc(var(--cel) * .5);
   border: none; border-radius: 4px; background: transparent;
 }
-.m3-grilla.juntas .m3-celda:hover { background: rgba(159,216,242,.12); }
+@media (hover: hover) { .m3-grilla.juntas .m3-celda:hover { background: rgba(159,216,242,.12); } }
 
 /* Stroop */
 .st-tarjeta {
@@ -377,20 +424,192 @@ input, select { user-select: text; -webkit-user-select: text; }
 .d6-b i.ok { animation: d3 2.4s infinite; }
 
 /* Buscador de escuelas */
+/* La lista va en el flujo del formulario (no flotando): con el teclado abierto se llega scrolleando. */
 .esc-lista {
-  position: absolute; left: 0; right: 0; top: 100%; z-index: 30; margin-top: 4px;
+  margin-top: 6px;
   background: #23493a; border: 2px solid var(--tiza-tenue); border-radius: 12px;
-  max-height: 290px; overflow-y: auto; box-shadow: 0 10px 24px rgba(0,0,0,.4);
+  max-height: min(290px, calc(var(--vh) * 40)); overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; box-shadow: 0 6px 16px rgba(0,0,0,.35);
 }
+.esc-estado { font-size: 16px; color: var(--tiza-tenue); margin-top: 4px; }
 .esc-op {
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%;
-  padding: 9px 14px; background: transparent; border: 0; border-bottom: 1px dashed rgba(255,255,255,.12);
+  min-height: 56px; padding: 10px 14px; background: transparent; border: 0; border-bottom: 1px dashed rgba(255,255,255,.12);
   color: var(--tiza); font-family: var(--fuente-ui); text-align: left; cursor: pointer;
 }
-.esc-op b { font-size: 18px; font-weight: 400; }
+.esc-op b { font-size: 18px; font-weight: 400; line-height: 1.2; }
 .esc-op small { font-size: 14px; color: var(--tiza-tenue); }
-.esc-op:hover { background: rgba(255,255,255,.08); }
+.esc-op:active { background: rgba(255,255,255,.14); }
+@media (hover: hover) { .esc-op:hover { background: rgba(255,255,255,.08); } }
 .esc-manual { color: var(--celeste); font-size: 16px; }
 .esc-elegida { display: flex; align-items: center; gap: 12px; font-size: clamp(18px, 2vw, 22px); color: var(--verde-tiza); border-bottom: 3px solid var(--verde-tiza); padding: 4px 4px 6px; }
 .esc-elegida span { flex: 1; }
-.esc-cambiar { background: transparent; border: 1px solid var(--tiza-tenue); color: var(--tiza-suave); border-radius: 8px; font-family: var(--fuente-ui); font-size: 15px; cursor: pointer; padding: 2px 10px; }
+.esc-cambiar { background: transparent; border: 1px solid var(--tiza-tenue); color: var(--tiza-suave); border-radius: 8px; font-family: var(--fuente-ui); font-size: 17px; cursor: pointer; padding: 6px 14px; min-height: 44px; }
+
+/* ============ Burbuja "Sobre nosotros" (pantalla principal) ============ */
+.burbuja-nosotros {
+  position: absolute; z-index: 5;
+  left: clamp(12px, 2.4vw, 32px);
+  bottom: clamp(12px, 2.4vw, 30px);
+  min-height: 52px; padding: 10px 22px;
+  font-family: var(--fuente-ui); font-size: clamp(19px, 2vw, 24px); color: #2b2d42;
+  background: #fbfaf5; border: 3px solid var(--amarillo);
+  border-radius: 28px 30px 30px 8px / 26px 30px 28px 10px;   /* globo de diálogo, cola abajo a la izquierda */
+  box-shadow: 3px 5px 0 rgba(0,0,0,.28);
+  cursor: pointer;
+  animation: flotar 2.6s ease-in-out 3; /* se mece 3 veces para llamar la atención y después queda quieta (más fácil de tocar) */
+  transition: transform .12s;
+}
+.burbuja-nosotros::after { /* cola del globo */
+  content: ''; position: absolute; left: 14px; bottom: -15px; width: 18px; height: 16px;
+  background: #fbfaf5; border-left: 3px solid var(--amarillo); border-bottom: 3px solid var(--amarillo);
+  clip-path: polygon(0 0, 100% 0, 0 100%); transform: none;
+}
+.burbuja-nosotros:active { transform: scale(.95); animation: none; }
+@keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .burbuja-nosotros { animation: none; } }
+
+/* ============ Sobre-pantalla (modal) ============ */
+.modal-fondo {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: rgba(10, 24, 17, .82);
+  animation: aparecer-fondo .2s ease both;
+  overscroll-behavior: contain;
+}
+@keyframes aparecer-fondo { from { opacity: 0; } to { opacity: 1; } }
+.modal-panel {
+  position: relative;
+  width: min(980px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; overflow: hidden;
+  color: var(--tiza); text-align: center; font-family: var(--fuente-ui);
+  background: linear-gradient(160deg, var(--pizarra) 0%, var(--pizarra-osc) 100%);
+  border: 4px solid var(--tiza-suave);
+  border-radius: 18px 22px 16px 24px / 22px 16px 24px 18px;
+  box-shadow: 0 0 0 6px var(--madera-osc), 0 18px 50px rgba(0,0,0,.6);
+  animation: aparecer .3s ease both;
+}
+.modal-cuerpo {
+  min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: clamp(18px, 3vw, 36px);
+}
+.modal-cerrar {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  width: 48px; height: 48px; padding: 0;
+  display: grid; place-items: center;
+  font-family: var(--fuente-ui); font-size: 24px; color: var(--tiza);
+  background: rgba(34, 68, 52, .92); border: 2px solid var(--tiza-suave); border-radius: 12px; cursor: pointer;
+}
+.modal-cerrar:active { background: rgba(255,255,255,.18); }
+
+/* contenido de "Sobre nosotros" */
+.sn-grilla { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(14px, 2.4vw, 26px); align-items: center; }
+.sn-cabecera { padding: 0 52px; } /* lugar para la X */
+.sn-cabecera .titulo { font-size: clamp(30px, 5vw, 52px); }
+.sn-caba {
+  display: inline-block; margin-top: 4px;
+  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(40px, 8vw, 84px); letter-spacing: .16em; line-height: 1;
+  color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3);
+}
+.sn-fotos {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
+  gap: clamp(10px, 2vw, 22px); margin: 0;
+}
+.sn-foto {
+  background: #fbfaf5; padding: 8px 8px 8px; border-radius: 4px;
+  box-shadow: 3px 5px 0 rgba(0,0,0,.3); transform: rotate(-1.2deg);
+}
+.sn-foto:nth-child(even) { transform: rotate(1.4deg); }
+.sn-foto img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; background: #ddd; }
+.sn-foto.vacia { display: grid; }
+.sn-foto.vacia span {
+  aspect-ratio: 4 / 3; display: grid; place-items: center;
+  color: #6b6f7a; font-size: 18px; border: 2px dashed #b8b8b0; border-radius: 2px;
+}
+.sn-logos { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: clamp(14px, 3vw, 36px); }
+.sn-logo { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sn-logo-papel {
+  --alto: clamp(140px, 22vw, 200px); /* alto del logo; el papel se ajusta a la imagen */
+  background: #fbfaf5; border-radius: 14px; padding: clamp(10px, 1.6vw, 16px);
+  box-shadow: 3px 5px 0 rgba(0,0,0,.3);
+  display: flex; align-items: center; justify-content: center;
+}
+.sn-logo-papel img { display: block; height: var(--alto); width: auto; max-width: 100%; object-fit: contain; }
+.sn-logo figcaption { font-size: clamp(17px, 2vw, 22px); color: var(--tiza-suave); }
+
+/* pantallas anchas: fotos arriba, los dos logos lado a lado abajo */
+.sn-fotos { max-width: 780px; width: 100%; margin-inline: auto; }
+@media (min-width: 720px) {
+  .sn-logos { flex-wrap: nowrap; }
+}
+/* celular acostado: fotos a la izquierda y logos a la derecha, para que entre sin scrollear */
+@media (min-width: 720px) and (max-height: 520px) {
+  .sn-grilla { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .sn-cabecera { grid-column: 1 / -1; }
+  .sn-logos { gap: 12px; }
+}
+@media (max-height: 520px) {
+  .sn-cabecera { display: flex; align-items: baseline; justify-content: center; gap: 6px 22px; flex-wrap: wrap; }
+  .sn-cabecera .titulo { font-size: 30px; }
+  .sn-caba { font-size: 40px; margin: 0; }
+  .sn-logo-papel { --alto: clamp(90px, calc(var(--vh) * 32), 140px); padding: 8px; }
+  .sn-logo figcaption { font-size: 15px; }
+  .modal-cuerpo { padding: 14px 18px; }
+}
+
+/* confirmación de salir */
+.confirmar-panel { width: min(520px, 100%); }
+.confirmar-panel .titulo { font-size: clamp(28px, 5vw, 40px); margin-top: 8px; }
+.confirmar-panel .consigna { margin: 10px 0 20px; }
+.confirmar-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.confirmar-botones .btn { min-height: 56px; }
+
+/* Aviso para la frase del Minijuego 2 (letras angostas con el celular parado) */
+.tip-girar { display: none; margin: -4px 0 10px; font-size: 17px; color: var(--celeste); }
+@media (orientation: portrait) and (max-width: 600px) { .tip-girar { display: block; } }
+
+/* ============ Celular parado: el encabezado tiene que entrar en el ancho ============ */
+@media (max-width: 600px) {
+  .encabezado { gap: 8px; padding-left: 10px; padding-right: 10px; }
+  .logo { font-size: 20px; }
+  .progreso { gap: 5px; }
+  .progreso .punto { width: 27px; height: 27px; font-size: 13px; border-width: 2px; }
+  .btn-pantalla-completa { display: none; } /* en celular parado no hace falta y no entra */
+}
+
+/* ============ Pantallas bajas (celular acostado, teclado abierto) ============ */
+@media (max-height: 520px) {
+  .repisa { display: none; }
+  .marco { padding-top: max(4px, env(safe-area-inset-top)); padding-bottom: max(4px, env(safe-area-inset-bottom)); }
+  .encabezado { padding-top: 6px; }
+  .logo { font-size: 22px; }
+  .progreso .punto { width: 28px; height: 28px; font-size: 14px; }
+  .escena-int { padding-top: 6px; padding-bottom: 6px; }
+  .escena-int.con-burbuja { padding-bottom: 6px; }
+  @media (max-width: 760px) { .escena-int.con-burbuja { padding-bottom: 66px; } }
+  .consigna { margin-bottom: 8px; font-size: 18px; }
+  .ronda-label { margin-bottom: 2px; font-size: 15px; }
+  .instr .titulo { font-size: 28px; margin-bottom: .25em; }
+  .instr .texto p { font-size: 18px; margin-bottom: .3em; }
+  .demo { min-height: 140px; padding: 10px; }
+  .m1 .caja { height: 50px; }
+  .m1 .celda { padding: 4px 0; }
+  .st-tarjeta { height: clamp(96px, calc(var(--vh) * 28), 140px); }
+  .st-boton { width: 64px; height: 64px; }
+  .m4-papel { height: 100px; }
+  .m4-boton { margin-top: 12px; }
+  .st-botones { margin-top: 12px; }
+  .m5-iguales { margin-top: 10px; }
+  .btn.grande { font-size: 22px; padding: .35em 1.4em; }
+  .burbuja-nosotros { min-height: 46px; padding: 6px 18px; bottom: 10px; }
+}
+
+/* ============ Rendimiento en celulares y tablets ============ */
+@media (pointer: coarse) {
+  /* mix-blend-mode sobre toda la pantalla obliga a recomponer en cada animación: se cambia por una textura simple */
+  .pizarra::before { mix-blend-mode: normal; opacity: .07; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aparecer, .modal-panel, .modal-fondo { animation-duration: .01s; }
+}

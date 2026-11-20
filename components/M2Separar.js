@@ -58,12 +58,13 @@ function RondaM2({ ronda, bloqueado, onTerminar }) {
     setSac(Date.now());
   };
 
-  const cw = `min(58px, calc((100vw - 90px) / ${text.length}))`;
+  const cw = `min(58px, calc((100vw - 56px) / ${text.length}))`;
 
   return (
     <div className="aparecer">
       <div className="ronda-label">Ronda {ronda + 1} de {ENSAYOS.m2}</div>
       <p className="consigna">Tocá los espacios donde termina cada palabra</p>
+      <p className="tip-girar">Tip: si girás el celular, las letras se ven más grandes</p>
       <div key={sac} className={`m2-frase tiza ${sac ? 'sacudir' : ''}`} style={{ '--cw': cw }}>
         {text.split('').map((letra, i) => (
           <div key={i} className="m2-letra" onClick={tocarLetra} data-i={i}>

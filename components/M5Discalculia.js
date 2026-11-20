@@ -52,7 +52,8 @@ function RondaM5({ ronda, ensayos, onTerminar }) {
 
   useTecla(' ', () => responder('iguales'));
 
-  const lado = 'min(330px, calc((100vw - 140px) / 2), calc(100vh - 380px))';
+  // Nunca menor a 130 px (con el celular acostado la cuenta por alto daba un valor negativo).
+  const lado = 'max(130px, min(330px, calc((100vw - 80px) / 2), calc(var(--vh) * 100 - 380px)))';
 
   return (
     <div className="aparecer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
