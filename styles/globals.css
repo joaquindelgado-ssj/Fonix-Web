@@ -171,8 +171,6 @@ input, select { user-select: text; -webkit-user-select: text; }
   -webkit-overflow-scrolling: touch;
 }
 .escena-centro { margin: auto; width: 100%; display: flex; flex-direction: column; align-items: center; }
-/* lugar para la burbuja "Sobre nosotros" (así el formulario puede scrollear por encima de ella) */
-@media (max-width: 760px) { .escena-int.con-burbuja { padding-bottom: calc(clamp(10px, 2vw, 28px) + 64px); } }
 .consigna { font-size: clamp(19px, 2.3vw, 27px); color: var(--tiza-suave); margin: 0 0 clamp(14px, 2.4vw, 30px); }
 .ronda-label { font-size: clamp(16px, 1.8vw, 21px); color: var(--amarillo); margin-bottom: 6px; letter-spacing: .04em; }
 
@@ -446,28 +444,49 @@ input, select { user-select: text; -webkit-user-select: text; }
 .esc-elegida span { flex: 1; }
 .esc-cambiar { background: transparent; border: 1px solid var(--tiza-tenue); color: var(--tiza-suave); border-radius: 8px; font-family: var(--fuente-ui); font-size: 17px; cursor: pointer; padding: 6px 14px; min-height: 44px; }
 
-/* ============ Burbuja "Sobre nosotros" (pantalla principal) ============ */
+/* ============ Burbuja "Sobre nosotros" (pantalla principal) ============
+   Dibujada con tiza, a la izquierda y un poco por encima del medio.
+   En pantallas anchas flota al costado del formulario; en celular parado va en el flujo,
+   arriba a la izquierda, para no tapar ningún campo. */
 .burbuja-nosotros {
-  position: absolute; z-index: 5;
-  left: clamp(12px, 2.4vw, 32px);
-  bottom: clamp(12px, 2.4vw, 30px);
-  min-height: 52px; padding: 10px 22px;
-  font-family: var(--fuente-ui); font-size: clamp(19px, 2vw, 24px); color: #2b2d42;
-  background: #fbfaf5; border: 3px solid var(--amarillo);
-  border-radius: 28px 30px 30px 8px / 26px 30px 28px 10px;   /* globo de diálogo, cola abajo a la izquierda */
-  box-shadow: 3px 5px 0 rgba(0,0,0,.28);
+  position: relative; z-index: 5; flex: none;
+  align-self: flex-start;
+  margin: calc(var(--vh) * 4) 0 32px; /* deja lugar a las burbujitas de abajo */
+  min-height: 48px; padding: 8px 22px;
+  font-family: var(--fuente-ui); font-size: clamp(19px, 2vw, 22px); line-height: 1.1; color: var(--tiza);
+  white-space: nowrap; text-align: center;
+  background: rgba(255,255,255,.05);
+  border: 3px solid var(--tiza);
+  border-radius: 26px 24px 25px 23px / 23px 26px 24px 25px;      /* trazo irregular de tiza */
+  text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 6px rgba(255,255,255,.12);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.08), inset 0 0 14px rgba(255,255,255,.06);
   cursor: pointer;
   animation: flotar 2.6s ease-in-out 3; /* se mece 3 veces para llamar la atención y después queda quieta (más fácil de tocar) */
-  transition: transform .12s;
+  transition: transform .12s, border-color .15s, color .15s;
 }
-.burbuja-nosotros::after { /* cola del globo */
-  content: ''; position: absolute; left: 14px; bottom: -15px; width: 18px; height: 16px;
-  background: #fbfaf5; border-left: 3px solid var(--amarillo); border-bottom: 3px solid var(--amarillo);
-  clip-path: polygon(0 0, 100% 0, 0 100%); transform: none;
+.burbuja-nosotros::before, .burbuja-nosotros::after { /* burbujitas de pensamiento, también de tiza */
+  content: ''; position: absolute; border: 2.5px solid var(--tiza); border-radius: 50%; background: rgba(255,255,255,.05);
 }
-.burbuja-nosotros:active { transform: scale(.95); animation: none; }
-@keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.burbuja-nosotros::before { width: 14px; height: 14px; left: 14px; bottom: -17px; }
+.burbuja-nosotros::after  { width: 8px;  height: 8px;  left: 4px;  bottom: -29px; }
+.burbuja-nosotros:active { transform: scale(.95); animation: none; border-color: var(--amarillo); color: var(--amarillo); }
+@media (hover: hover) { .burbuja-nosotros:hover { border-color: var(--amarillo); color: var(--amarillo); } }
+@keyframes flotar { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-5px) rotate(1deg); } }
 @media (prefers-reduced-motion: reduce) { .burbuja-nosotros { animation: none; } }
+
+/* pantallas anchas / celular acostado: globo redondo de dos renglones, sobre el borde izquierdo y un poco arriba del medio */
+@media (min-width: 761px) {
+  .burbuja-nosotros {
+    position: absolute; align-self: auto; margin: 0;
+    left: clamp(12px, 2.2vw, 34px); top: 34%;
+    width: 112px; height: 92px; padding: 10px;
+    display: grid; place-items: center;
+    white-space: normal; font-size: clamp(20px, 2vw, 24px);
+    border-radius: 54% 46% 52% 48% / 58% 52% 48% 42%;
+  }
+  .burbuja-nosotros::before { left: 16px; bottom: -18px; }
+  .burbuja-nosotros::after  { left: 4px;  bottom: -31px; }
+}
 
 /* ============ Sobre-pantalla (modal) ============ */
 .modal-fondo {
@@ -503,60 +522,36 @@ input, select { user-select: text; -webkit-user-select: text; }
 }
 .modal-cerrar:active { background: rgba(255,255,255,.18); }
 
-/* contenido de "Sobre nosotros" */
-.sn-grilla { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(14px, 2.4vw, 26px); align-items: center; }
-.sn-cabecera { padding: 0 52px; } /* lugar para la X */
-.sn-cabecera .titulo { font-size: clamp(30px, 5vw, 52px); }
-.sn-caba {
-  display: inline-block; margin-top: 4px;
-  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(40px, 8vw, 84px); letter-spacing: .16em; line-height: 1;
-  color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3);
-}
-.sn-fotos {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
-  gap: clamp(10px, 2vw, 22px); margin: 0;
-}
-.sn-foto {
-  background: #fbfaf5; padding: 8px 8px 8px; border-radius: 4px;
-  box-shadow: 3px 5px 0 rgba(0,0,0,.3); transform: rotate(-1.2deg);
-}
-.sn-foto:nth-child(even) { transform: rotate(1.4deg); }
-.sn-foto img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 2px; background: #ddd; }
-.sn-foto.vacia { display: grid; }
-.sn-foto.vacia span {
-  aspect-ratio: 4 / 3; display: grid; place-items: center;
-  color: #6b6f7a; font-size: 18px; border: 2px dashed #b8b8b0; border-radius: 2px;
-}
-.sn-logos { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: clamp(14px, 3vw, 36px); }
-.sn-logo { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* contenido de "Sobre nosotros": logos arriba, título + CABA, 4 integrantes y el profesor abajo */
+.sn-grilla { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4vw, 24px); }
+.sn-logos { display: flex; justify-content: center; align-items: flex-start; gap: clamp(12px, 3vw, 32px); padding-right: 52px; padding-left: 52px; } /* lugar para la X */
+.sn-logo { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 46%; }
 .sn-logo-papel {
-  --alto: clamp(140px, 22vw, 200px); /* alto del logo; el papel se ajusta a la imagen */
-  background: #fbfaf5; border-radius: 14px; padding: clamp(10px, 1.6vw, 16px);
+  --alto: clamp(86px, 14vw, 128px); /* alto del logo; el papel se ajusta a la imagen */
+  background: #fbfaf5; border-radius: 12px; padding: clamp(8px, 1.2vw, 12px);
   box-shadow: 3px 5px 0 rgba(0,0,0,.3);
   display: flex; align-items: center; justify-content: center;
 }
 .sn-logo-papel img { display: block; height: var(--alto); width: auto; max-width: 100%; object-fit: contain; }
-.sn-logo figcaption { font-size: clamp(17px, 2vw, 22px); color: var(--tiza-suave); }
-
-/* pantallas anchas: fotos arriba, los dos logos lado a lado abajo */
-.sn-fotos { max-width: 780px; width: 100%; margin-inline: auto; }
-@media (min-width: 720px) {
-  .sn-logos { flex-wrap: nowrap; }
+.sn-logo figcaption { font-size: clamp(15px, 1.7vw, 19px); line-height: 1.15; color: var(--tiza-suave); }
+.sn-cabecera .titulo { font-size: clamp(30px, 5vw, 52px); }
+.sn-caba {
+  display: inline-block; margin-top: 2px;
+  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(40px, 8vw, 84px); letter-spacing: .16em; line-height: 1;
+  color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3);
 }
-/* celular acostado: fotos a la izquierda y logos a la derecha, para que entre sin scrollear */
-@media (min-width: 720px) and (max-height: 520px) {
-  .sn-grilla { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
-  .sn-cabecera { grid-column: 1 / -1; }
-  .sn-logos { gap: 12px; }
+.sn-equipo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 2vw, 22px); width: min(100%, 820px); }
+@media (min-width: 560px) { .sn-equipo { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sn-foto {
+  margin: 0; background: #fbfaf5; padding: 8px 8px 6px; border-radius: 4px;
+  box-shadow: 3px 5px 0 rgba(0,0,0,.3); transform: rotate(-1.2deg);
 }
-@media (max-height: 520px) {
-  .sn-cabecera { display: flex; align-items: baseline; justify-content: center; gap: 6px 22px; flex-wrap: wrap; }
-  .sn-cabecera .titulo { font-size: 30px; }
-  .sn-caba { font-size: 40px; margin: 0; }
-  .sn-logo-papel { --alto: clamp(90px, calc(var(--vh) * 32), 140px); padding: 8px; }
-  .sn-logo figcaption { font-size: 15px; }
-  .modal-cuerpo { padding: 14px 18px; }
-}
+.sn-foto.par { transform: rotate(1.4deg); }
+.sn-foto img { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 2px; background: #ddd; }
+.sn-foto figcaption { padding: 7px 2px 2px; font-size: clamp(17px, 2vw, 21px); line-height: 1.1; color: #2b2d42; text-align: center; }
+.sn-profe { width: min(62%, 250px); }
+.sn-profe .sn-foto { transform: rotate(.8deg); }
+.sn-profe .sn-foto figcaption { font-size: clamp(19px, 2.2vw, 23px); }
 
 /* confirmación de salir */
 .confirmar-panel { width: min(520px, 100%); }
@@ -586,8 +581,6 @@ input, select { user-select: text; -webkit-user-select: text; }
   .logo { font-size: 22px; }
   .progreso .punto { width: 28px; height: 28px; font-size: 14px; }
   .escena-int { padding-top: 6px; padding-bottom: 6px; }
-  .escena-int.con-burbuja { padding-bottom: 6px; }
-  @media (max-width: 760px) { .escena-int.con-burbuja { padding-bottom: 66px; } }
   .consigna { margin-bottom: 8px; font-size: 18px; }
   .ronda-label { margin-bottom: 2px; font-size: 15px; }
   .instr .titulo { font-size: 28px; margin-bottom: .25em; }
@@ -602,7 +595,6 @@ input, select { user-select: text; -webkit-user-select: text; }
   .st-botones { margin-top: 12px; }
   .m5-iguales { margin-top: 10px; }
   .btn.grande { font-size: 22px; padding: .35em 1.4em; }
-  .burbuja-nosotros { min-height: 46px; padding: 6px 18px; bottom: 10px; }
 }
 
 /* ============ Rendimiento en celulares y tablets ============ */

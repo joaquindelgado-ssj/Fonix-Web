@@ -29,9 +29,8 @@ Se juega con mouse, teclado (barra ESPACIO) o pantalla táctil.
 - Para pantalla completa en iPhone: Compartir → "Agregar a pantalla de inicio" (Safari no permite el botón ⛶ en iPhone).
 
 ## "Sobre nosotros" (pantalla principal)
-La burbuja de la izquierda abre un sobre-pantalla con las fotos del equipo, CABA y los logos de Otto Krause y de la Dirección de Educación Técnica (`public/logos/`).
-Para cargar las fotos del equipo: copiá los archivos a `public/equipo/` y sumá una línea en `lib/equipo.js`
-(`{ src: '/equipo/foto.jpg', alt: 'texto' }`). Mientras la lista esté vacía se ven marcos de ejemplo.
+La burbuja de tiza, a la izquierda de la pantalla principal, abre un sobre-pantalla con: los logos de Otto Krause y de la Dirección de Educación Técnica arriba del todo (`public/logos/`), "CABA", los cuatro integrantes con su nombre y, abajo, el profesor.
+Nombres y fotos están en `lib/equipo.js`; las fotos (cuadradas, ~520 px) en `public/equipo/`. Para cambiar una foto, reemplazá el archivo con el mismo nombre.
 
 ## Arquitectura
 - `pages/index.js` + `components/`: el juego. El navegador solo registra datos crudos (aciertos, fallos, tiempos).
