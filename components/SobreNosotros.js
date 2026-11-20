@@ -5,7 +5,7 @@ import Modal from './Modal';
 const LOGOS = ['/logos/otto-krause.png', '/logos/direccion-tecnica.png'];
 
 // Burbuja de tiza a la izquierda de la pantalla principal. Al tocarla abre el sobre-pantalla
-// "Sobre nosotros": logos arriba del todo, CABA, los integrantes con su nombre y el profesor abajo.
+// "Sobre nosotros": CABA en la esquina, título arriba al medio, logos debajo, los integrantes con su nombre y el profesor abajo.
 export default function SobreNosotros() {
   const [abierto, setAbierto] = useState(false);
 
@@ -31,6 +31,11 @@ export default function SobreNosotros() {
       {abierto && (
         <Modal idTitulo="sn-titulo" onCerrar={() => setAbierto(false)} className="sn-panel">
           <div className="sn-grilla">
+            <header className="sn-cabecera">
+              <div className="sn-caba">CABA</div>
+              <h2 id="sn-titulo" className="titulo">Sobre nosotros</h2>
+            </header>
+
             <div className="sn-logos">
               <figure className="sn-logo">
                 <div className="sn-logo-papel">
@@ -45,11 +50,6 @@ export default function SobreNosotros() {
                 <figcaption>Dirección de Educación Técnica</figcaption>
               </figure>
             </div>
-
-            <header className="sn-cabecera">
-              <h2 id="sn-titulo" className="titulo">Sobre nosotros</h2>
-              <div className="sn-caba">CABA</div>
-            </header>
 
             <div className="sn-equipo">
               {INTEGRANTES.map((p, i) => <Persona key={p.nombre} persona={p} indice={i} />)}
