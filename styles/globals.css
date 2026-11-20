@@ -522,9 +522,9 @@ input, select { user-select: text; -webkit-user-select: text; }
 }
 .modal-cerrar:active { background: rgba(255,255,255,.18); }
 
-/* contenido de "Sobre nosotros": logos arriba, título + CABA, 4 integrantes y el profesor abajo */
+/* contenido de "Sobre nosotros": CABA en la esquina, título al medio, logos, 4 integrantes y el profesor abajo */
 .sn-grilla { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.4vw, 24px); }
-.sn-logos { display: flex; justify-content: center; align-items: flex-start; gap: clamp(12px, 3vw, 32px); padding-right: 52px; padding-left: 52px; } /* lugar para la X */
+.sn-logos { display: flex; justify-content: center; align-items: flex-start; gap: clamp(12px, 3vw, 32px); }
 .sn-logo { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 46%; }
 .sn-logo-papel {
   --alto: clamp(86px, 14vw, 128px); /* alto del logo; el papel se ajusta a la imagen */
@@ -534,10 +534,11 @@ input, select { user-select: text; -webkit-user-select: text; }
 }
 .sn-logo-papel img { display: block; height: var(--alto); width: auto; max-width: 100%; object-fit: contain; }
 .sn-logo figcaption { font-size: clamp(15px, 1.7vw, 19px); line-height: 1.15; color: var(--tiza-suave); }
-.sn-cabecera .titulo { font-size: clamp(30px, 5vw, 52px); }
+.sn-cabecera { position: relative; width: 100%; display: flex; align-items: flex-start; justify-content: center; padding: 0 clamp(72px, 11vw, 120px); } /* lugar para CABA a la izquierda y la X a la derecha */
+.sn-cabecera .titulo { margin: 0; min-height: 48px; display: flex; align-items: center; justify-content: center; font-size: clamp(24px, 5vw, 52px); line-height: 1.05; }
 .sn-caba {
-  display: inline-block; margin-top: 2px;
-  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(40px, 8vw, 84px); letter-spacing: .16em; line-height: 1;
+  position: absolute; top: 0; left: 0; height: 48px; display: flex; align-items: center;
+  font-family: var(--fuente-titulo); font-weight: 700; font-size: clamp(18px, 3.6vw, 42px); letter-spacing: .1em; line-height: 1;
   color: var(--amarillo); text-shadow: 0 0 1px rgba(255,255,255,.7), 0 0 14px rgba(247,226,124,.3);
 }
 .sn-equipo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 2vw, 22px); width: min(100%, 820px); }
