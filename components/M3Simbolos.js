@@ -35,7 +35,9 @@ function RondaM3({ ronda, r, bloqueado, onTerminar }) {
   };
 
   const juntas = espaciado === 'juntas';
-  const cel = `min(${size === 4 ? 92 : 78}px, calc((100vh - 330px) / ${size}), calc((100vw - 120px) / ${size}))`;
+  // Tamaño de celda: entra en la pantalla, pero nunca menor a 40 px (con el celular acostado
+  // la cuenta por alto daba ~12 px, imposible de tocar; en ese caso la zona de juego scrollea).
+  const cel = `max(40px, min(${size === 4 ? 92 : 78}px, calc((var(--vh) * 100 - 330px) / ${size}), calc((100vw - 90px) / ${size})))`;
 
   return (
     <div className="aparecer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

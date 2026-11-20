@@ -22,6 +22,17 @@ Versión web de FONIX: cribado pedagógico de habilidades lectoras mediante 5 mi
 
 Se juega con mouse, teclado (barra ESPACIO) o pantalla táctil.
 
+## Pantalla táctil (feria de ciencias)
+- Pensado para celulares y tablets: el área de juego scrollea si la pantalla es baja (celular acostado, teclado abierto), los botones tienen zona táctil de 44–48 px, el hover solo se aplica con mouse, usa alto dinámico (`dvh`) y mantiene la pantalla encendida (Wake Lock).
+- Salir de la prueba pide confirmación con un cuadro propio (no el `confirm` del navegador).
+- El Minijuego 2 (frases) se ve más grande con el celular acostado; con el celular parado se muestra un aviso.
+- Para pantalla completa en iPhone: Compartir → "Agregar a pantalla de inicio" (Safari no permite el botón ⛶ en iPhone).
+
+## "Sobre nosotros" (pantalla principal)
+La burbuja de la izquierda abre un sobre-pantalla con las fotos del equipo, CABA y los logos de Otto Krause y de la Dirección de Educación Técnica (`public/logos/`).
+Para cargar las fotos del equipo: copiá los archivos a `public/equipo/` y sumá una línea en `lib/equipo.js`
+(`{ src: '/equipo/foto.jpg', alt: 'texto' }`). Mientras la lista esté vacía se ven marcos de ejemplo.
+
 ## Arquitectura
 - `pages/index.js` + `components/`: el juego. El navegador solo registra datos crudos (aciertos, fallos, tiempos).
 - `pages/api/guardar-resultados.js`: valida los datos, calcula KPIs y puntaje y guarda en Neon.

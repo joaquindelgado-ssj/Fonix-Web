@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Instrucciones, Pizarron } from '../components/comun';
+import Modal from '../components/Modal';
 import { DemoM1, DemoM2, DemoM3, DemoM4, DemoM5, DemoM6 } from '../components/demos';
 import M1Unir from '../components/M1Unir';
 import M2Separar from '../components/M2Separar';
@@ -75,6 +76,24 @@ const inicial = () => ({ fase: 'registro', juego: 0, paso: 'instr', participante
 export default function Home() {
   const [e, setE] = useState(inicial);
   const [estadoEnvio, setEstadoEnvio] = useState(null);
+  const [confirmandoSalir, setConfirmandoSalir] = useState(false);
+
+  // Mantiene la pantalla encendida mientras se juega (en la feria nadie toca el celular
+  // entre consigna y consigna y se apagaría). Si el navegador no lo soporta, no pasa nada.
+  useEffect(() => {
+    let candado = null;
+    const pedir = async () => {
+      try {
+        if (document.visibilityState === 'visible' && navigator.wakeLock) candado = await navigator.wakeLock.request('screen');
+      } catch { /* sin permiso o sin soporte */ }
+    };
+    pedir();
+    document.addEventListener('visibilitychange', pedir);
+    return () => {
+      document.removeEventListener('visibilitychange', pedir);
+      try { candado?.release(); } catch { /* nada */ }
+    };
+  }, []);
 
   // Reintenta envíos pendientes cada 30 s
   useEffect(() => {
@@ -104,12 +123,12 @@ export default function Home() {
       .catch(() => setEstadoEnvio('pendiente'));
   }, [e.fase, e.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const salir = () => {
-    if (window.confirm('¿Cancelar esta prueba? Se perderán las respuestas.')) setE(inicial());
-  };
+  // Confirmación propia (botones grandes para el dedo; los diálogos nativos pueden estar bloqueados)
+  const salir = () => setConfirmandoSalir(true);
+  const cancelarPrueba = () => { setConfirmandoSalir(false); setE(inicial()); };
 
   if (e.fase === 'registro') {
-    return <Pizarron><Registro onListo={empezar} /></Pizarron>;
+    return <Pizarron burbuja><Registro onListo={empezar} /></Pizarron>;
   }
 
   if (e.fase === 'final') {
@@ -134,6 +153,16 @@ export default function Home() {
         />
       ) : (
         <j.Comp key={`j${e.juego}`} onFin={terminarJuego} />
+      )}
+      {confirmandoSalir && (
+        <Modal idTitulo="salir-titulo" onCerrar={() => setConfirmandoSalir(false)} className="confirmar-panel">
+          <h2 id="salir-titulo" className="titulo">¿Cancelar la prueba?</h2>
+          <p className="consigna">Se van a perder las respuestas.</p>
+          <div className="confirmar-botones">
+            <button type="button" className="btn primario" onClick={() => setConfirmandoSalir(false)}>Seguir jugando</button>
+            <button type="button" className="btn" onClick={cancelarPrueba}>Sí, cancelar</button>
+          </div>
+        </Modal>
       )}
     </Pizarron>
   );

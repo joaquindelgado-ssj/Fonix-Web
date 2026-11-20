@@ -1,9 +1,13 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { esperar, useTecla } from '../lib/util';
+import SobreNosotros from './SobreNosotros';
 
 const NOMBRES = ['Unir', 'Separar', 'Símbolos', 'Cambios', 'Colores', 'Números'];
 
-export function Pizarron({ juegoActual = -1, onSalir, children }) {
+export function Pizarron({ juegoActual = -1, onSalir, burbuja = false, children }) {
+  // iPhone no permite pantalla completa: ahí el botón no se muestra.
+  const [hayPantallaCompleta, setHayPantallaCompleta] = useState(false);
+  useEffect(() => { setHayPantallaCompleta(!!document.documentElement.requestFullscreen); }, []);
   const pantallaCompleta = () => {
     const d = document;
     if (!d.fullscreenElement) d.documentElement.requestFullscreen?.().catch(() => {});
@@ -29,12 +33,20 @@ export function Pizarron({ juegoActual = -1, onSalir, children }) {
           )}
           <div className="acciones-top">
             {onSalir && (
-              <button className="btn-icono" title="Cancelar prueba" onClick={onSalir}>✕</button>
+              <button type="button" className="btn-icono" title="Cancelar prueba" aria-label="Cancelar prueba" onClick={onSalir}>✕</button>
             )}
-            <button className="btn-icono" title="Pantalla completa" onClick={pantallaCompleta}>⛶</button>
+            {hayPantallaCompleta && (
+              <button type="button" className="btn-icono btn-pantalla-completa" title="Pantalla completa" aria-label="Pantalla completa" onClick={pantallaCompleta}>⛶</button>
+            )}
           </div>
         </header>
-        <main className="escena">{children}</main>
+        <main className="escena">
+          {/* .escena-int es el que scrollea si la pantalla es baja (celular horizontal, teclado abierto) */}
+          <div className={`escena-int ${burbuja ? 'con-burbuja' : ''}`}>
+            <div className="escena-centro">{children}</div>
+          </div>
+        </main>
+        {burbuja && <SobreNosotros />}
         <div className="repisa" aria-hidden="true">
           <div className="tizita" style={{ left: '14%', width: 46, background: '#f5f3ea' }} />
           <div className="tizita" style={{ left: '20%', width: 34, background: '#f7e27c' }} />
