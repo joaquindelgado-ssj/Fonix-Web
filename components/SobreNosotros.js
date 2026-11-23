@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { INTEGRANTES, PROFESOR } from '../lib/equipo';
 import Modal from './Modal';
+import { registrar } from '../lib/navegacion';
 
 const LOGOS = ['/logos/otto-krause.png', '/logos/direccion-tecnica.png'];
 
@@ -23,7 +24,7 @@ export default function SobreNosotros() {
       <button
         type="button"
         className="burbuja-nosotros"
-        onClick={() => setAbierto(true)}
+        onClick={() => { registrar('sobre_nosotros'); setAbierto(true); }}
         aria-haspopup="dialog"
       >
         Sobre nosotros

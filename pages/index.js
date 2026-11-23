@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Instrucciones, Pizarron } from '../components/comun';
 import Modal from '../components/Modal';
 import { DemoM1, DemoM2, DemoM3, DemoM4, DemoM5, DemoM6 } from '../components/demos';
@@ -12,6 +12,7 @@ import { Final, Registro } from '../components/Pantallas';
 import { enviarResultados, vaciarCola } from '../lib/envio';
 import { nuevoId } from '../lib/util';
 import { VERSION_PRUEBA } from '../lib/datos';
+import { registrar } from '../lib/navegacion';
 
 const JUEGOS = [
   {
@@ -77,6 +78,17 @@ export default function Home() {
   const [e, setE] = useState(inicial);
   const [estadoEnvio, setEstadoEnvio] = useState(null);
   const [confirmandoSalir, setConfirmandoSalir] = useState(false);
+  const eRef = useRef(e);
+  eRef.current = e;
+  const juegoActual = () => JUEGOS[eRef.current.juego]?.clave;
+
+  // Registro de navegación: una visita al cargar y un abandono si cierran la pestaña a mitad de la prueba
+  useEffect(() => {
+    registrar('visita');
+    const alSalir = () => { if (eRef.current.fase === 'juego') registrar('abandono', { juego: juegoActual() }); };
+    window.addEventListener('pagehide', alSalir);
+    return () => window.removeEventListener('pagehide', alSalir);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mantiene la pantalla encendida mientras se juega (en la feria nadie toca el celular
   // entre consigna y consigna y se apagaría). Si el navegador no lo soporta, no pasa nada.
@@ -101,9 +113,13 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
-  const empezar = (participante) => setE({ ...inicial(), fase: 'juego', participante, id: nuevoId() });
+  const empezar = (participante) => {
+    registrar('inicio_prueba');
+    setE({ ...inicial(), fase: 'juego', participante, id: nuevoId() });
+  };
 
   const terminarJuego = useCallback((resultados) => {
+    registrar('juego_fin', { juego: juegoActual() });
     setE((prev) => {
       const juego = JUEGOS[prev.juego];
       const rondas = { ...prev.rondas, [juego.clave]: resultados };
@@ -117,6 +133,7 @@ export default function Home() {
   // Al llegar a la pantalla final se envían los datos crudos al servidor
   useEffect(() => {
     if (e.fase !== 'final') return;
+    registrar('fin_prueba');
     setEstadoEnvio('enviando');
     enviarResultados({ id_sesion: e.id, version: VERSION_PRUEBA, participante: e.participante, rondas: e.rondas })
       .then(setEstadoEnvio)
@@ -125,7 +142,7 @@ export default function Home() {
 
   // Confirmación propia (botones grandes para el dedo; los diálogos nativos pueden estar bloqueados)
   const salir = () => setConfirmandoSalir(true);
-  const cancelarPrueba = () => { setConfirmandoSalir(false); setE(inicial()); };
+  const cancelarPrueba = () => { registrar('cancelacion', { juego: juegoActual() }); setConfirmandoSalir(false); setE(inicial()); };
 
   if (e.fase === 'registro') {
     return <Pizarron burbuja><Registro onListo={empezar} /></Pizarron>;
@@ -134,7 +151,7 @@ export default function Home() {
   if (e.fase === 'final') {
     return (
       <Pizarron juegoActual={JUEGOS.length}>
-        <Final nombre={e.participante.nombre} estado={estadoEnvio} onNueva={() => { setEstadoEnvio(null); setE(inicial()); }} />
+        <Final nombre={e.participante.nombre} estado={estadoEnvio} onNueva={() => { registrar('nueva_prueba'); setEstadoEnvio(null); setE(inicial()); }} />
       </Pizarron>
     );
   }
@@ -149,7 +166,7 @@ export default function Home() {
           titulo={j.titulo}
           lineas={j.lineas}
           demo={j.demo}
-          onComenzar={() => setE((p) => ({ ...p, paso: 'jugar' }))}
+          onComenzar={() => { registrar('juego_inicio', { juego: j.clave }); setE((p) => ({ ...p, paso: 'jugar' })); }}
         />
       ) : (
         <j.Comp key={`j${e.juego}`} onFin={terminarJuego} />
